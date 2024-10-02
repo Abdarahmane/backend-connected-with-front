@@ -17,28 +17,54 @@ const validateCreateRecipe = () => {
   ];
 };
 
-// Validation pour la mise à jour d'une recette
+const validateUpdateCategory = () => {
+  return [
+    param("id").not().isEmpty().withMessage("L'ID est requis!"),
+    check("name")
+      .optional() // Make this field optional for update
+      .not()
+      .isEmpty()
+      .withMessage("Le nom de la catégorie ne peut pas être vide!")
+      .bail()
+      .isLength({ min: 3 })
+      .withMessage("Minimum 3 caractères requis!"),
+  ];
+};
+
+const validateCreateCategory = () => {
+  return [
+    check("name")
+      .not()
+      .isEmpty()
+      .withMessage("Le nom de la catégorie ne peut pas être vide!")
+      .bail()
+      .isLength({ min: 3 })
+      .withMessage("Minimum 3 caractères requis!"),
+  ];
+};
+
+// Validation for updating a recipe
 const validateUpdateRecipe = () => {
   return [
     param("id").not().isEmpty().withMessage("L'ID est requis!"),
     check("titre")
-      .optional() // Rendre ce champ facultatif pour la mise à jour
+      .optional() // Make this field optional for update
       .isLength({ min: 6 })
       .withMessage("Minimum 6 caractères requis pour le titre!"),
     check("ingredients")
-      .optional() // Rendre ce champ facultatif pour la mise à jour
+      .optional() // Make this field optional for update
       .not()
       .isEmpty()
       .withMessage("Les ingrédients ne peuvent pas être vides!"),
     check("type")
-      .optional() // Rendre ce champ facultatif pour la mise à jour
+      .optional() // Make this field optional for update
       .not()
       .isEmpty()
       .withMessage("Le type ne peut pas être vide!"),
   ];
 };
 
-// Validation pour la suppression d'une recette
+// Validation for deleting a recipe
 const validateDeleteRecipe = () => {
   return [
     param("id")
@@ -48,7 +74,7 @@ const validateDeleteRecipe = () => {
   ];
 };
 
-// Middleware de validation
+// Middleware for validation
 const validate = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -57,10 +83,12 @@ const validate = (req, res, next) => {
   next();
 };
 
-// Exportation des fonctions
+// Exporting the functions
 export {
   validateCreateRecipe,
   validateUpdateRecipe,
   validateDeleteRecipe,
   validate,
+  validateCreateCategory,
+  validateUpdateCategory, // Ensure this is included
 };

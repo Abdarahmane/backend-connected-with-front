@@ -1,4 +1,5 @@
-import db from "../config/db.js"; // Assurez-vous que le chemin est correct
+import db from '../config/db.js'; // Ensure the path reflects your directory structure
+
 
 // Obtenir une recette par titre
 const getRecipeByTitle = async (titre) => {
@@ -9,11 +10,11 @@ const getRecipeByTitle = async (titre) => {
 
 // Créer une nouvelle recette
 const createRecipe = async (recipeData) => {
-  const { titre, ingredients, type } = recipeData;
+  const { titre, ingredients, type, category_id } = recipeData; // Include category_id
   const query =
-    "INSERT INTO recipes (titre, ingredients, type) VALUES (?, ?, ?)";
-  const [result] = await db.query(query, [titre, ingredients, type]);
-  return { id: result.insertId, titre, ingredients, type };
+    "INSERT INTO recipes (titre, ingredients, type, category_id) VALUES (?, ?, ?, ?)";
+  const [result] = await db.query(query, [titre, ingredients, type, category_id]); // Include category_id
+  return { id: result.insertId, titre, ingredients, type, category_id }; // Include category_id
 };
 
 // Obtenir toutes les recettes
@@ -39,11 +40,11 @@ const updateRecipe = async (id, recipeData) => {
     throw new Error("Invalid ID format");
   }
 
-  const { titre, ingredients, type } = recipeData;
+  const { titre, ingredients, type, category_id } = recipeData; // Include category_id
   const query =
-    "UPDATE recipes SET titre = ?, ingredients = ?, type = ? WHERE id = ?";
-  await db.query(query, [titre, ingredients, type, id]);
-  return { id, titre, ingredients, type };
+    "UPDATE recipes SET titre = ?, ingredients = ?, type = ?, category_id = ? WHERE id = ?";
+  await db.query(query, [titre, ingredients, type, category_id, id]); // Include category_id
+  return { id, titre, ingredients, type, category_id }; // Include category_id
 };
 
 // Supprimer une recette

@@ -1,10 +1,11 @@
-/* eslint-disable */
 import express from "express"; // Correct import syntax without parentheses
-import recipeRoutes from "./routes/recipeRoutes.js"; // Correct import syntax, including .js for ES modules
+import cors from "cors"; // Import CORS
+import recipeRoutes from "./routes/recipe.js"; // Correct import syntax, including .js for ES modules
 
 const app = express(); // Correct initialization of 'app'
 
-app.use(express.json());
+app.use(cors()); // Enable CORS for all routes
+app.use(express.json()); // Middleware to parse JSON request bodies
 
 // Use the recipe routes
 app.use("/api", recipeRoutes);

@@ -1,4 +1,6 @@
-import RecipeModel from "../models/Recipe.js";
+import RecipeModel from "../models/recipe.js";
+import CategoryModel from "../models/category.js"; // Import the Category model
+
 
 const validateRecipeFields = (fields) => {
   const errors = [];
@@ -26,11 +28,19 @@ const validateRecipeFields = (fields) => {
       location: "body",
     });
   }
+  if (!fields.categoryName || fields.categoryName.trim() === "") {
+    errors.push({
+      type: "field",
+      msg: "Le nom de la catégorie ne peut pas être vide!",
+      path: "categoryName",
+      location: "body",
+    });
+  }
   return errors;
 };
 
 export const createRecipe = async (req, res) => {
-  const { titre, ingredients, instructions, type } = req.body;
+  const { titre, ingredients, type, categoryName } = req.body; // Include categoryName
 
   const errors = validateRecipeFields(req.body);
   if (errors.length > 0) {
@@ -40,18 +50,38 @@ export const createRecipe = async (req, res) => {
   try {
     const existingRecipe = await RecipeModel.getRecipeByTitle(titre);
     if (existingRecipe) {
-      return res
-        .status(400)
-        .json({ message: "Une recette avec ce titre existe déjà." });
+      return res.status(400).json({ message: "Une recette avec ce titre existe déjà." });
     }
 
-    const newRecipe = await RecipeModel.createRecipe(req.body);
+    // Check if the category exists using the Category model
+    const existingCategory = await CategoryModel.getCategoryByName(categoryName);
+    let categoryId;
+
+    if (existingCategory) {
+      // If category exists, use its ID
+      categoryId = existingCategory.id;
+    } else {
+      // If category does not exist, create a new category using the Category model
+      const newCategory = await CategoryModel.createCategory(categoryName);
+      categoryId = newCategory.id; // Get the new category ID
+    }
+
+    // Prepare the recipe data with the category ID
+    const recipeData = {
+      titre,
+      ingredients,
+      type,
+      category_id: categoryId // Add the category ID
+    };
+
+    const newRecipe = await RecipeModel.createRecipe(recipeData);
     return res.status(201).json(newRecipe);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
+// Other functions remain unchanged...
 export const getAllRecipes = async (req, res) => {
   try {
     const recipes = await RecipeModel.getAllRecipes();
@@ -106,6 +136,7 @@ export const deleteRecipe = async (req, res) => {
   }
 };
 
+// Exporting all functions
 export default {
   createRecipe,
   getAllRecipes,
